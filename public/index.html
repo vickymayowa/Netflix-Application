@@ -59,79 +59,82 @@
             appId: "1:754229905760:web:f8aea695d4e9969a1af605"
         };
         
-        // Initialize Firebase
+        // Global Variable Declarations
         const app = initializeApp(firebaseConfig);
         const database = getDatabase();
         const storage = getStorage()
 
-        let movieIndex = 0 
+        let movieIndex = 0
         uploadBtn.addEventListener("click",()=>{
-          let file = movieFile.files[0]
-          let filename = file.name
+            let file = movieFile.files[0]
+            let filename = file.name
             let movie = {
                 title : movieTitle.value,
-                Duration : movieDuration.value,
-                Genre : movieGenre.value,
-                Cast : movieCast.value,
-                Synopsis :movieSynopsis.value,
+                duration : movieDuration.value,
+                genre : movieGenre.value,
+                cast: movieCast.value,
+                synopsis : movieSynopsis.value,
                 movieName : filename
             }
+            // Clear the previous inputs
             myForm.reset()
-            console.log(movie)
-            let movieRef = ref(database,`Movies/${movieIndex}`)
+            // Save the info into the database
+            let movieRef = ref(database,`allMovies/${movieIndex}`)
             set(movieRef,movie)
-            let movieStRef = StRef(storage,`${filename}`)
+            console.log(movie)
+            // Upload the movie to firebase storage
+            let movieStRef = stRef(storage,`${filename}`)
             const uploadTask = uploadBytesResumable(movieStRef,file)
             uploadTask.on("state-changed",(snapshot)=>{
-              let percentageUpload = Math.round((snapshot.bytesTransferred/snapshot.totalBytes)*100)
-              // Add a progress bar and an alert
-        // Add a progress bar and an alert
-        progressBar.innerHTML = `
-        <div class="progress" >
-            <div 
-                class="progress-bar progress-bar-striped progress-bar-animated" 
-                role="progressbar" 
-                style="width: ${percentageUpload}%;" 
-                aria-valuenow="${percentageUpload}" 
-                aria-valuemin="0" 
-                aria-valuemax="100"
-                >${percentageUpload}%
-            </div>
-        </div>
-       
-        `
-    },
-    (error)=>{
-        // in case the upload fails
-        console.log(err)
-    },()=>{
-        // handle successful uploads
-        console.log("upload is complete")
-        progressBar.innerHTML = ""
-        alertDiv.innerHTML = `
-        <p class="text-center">Upload Successful!</p>
-        `
-        alertDiv.className = "alert alert-success"
-        setTimeout(()=>{
-            alertDiv.innerHTML = ""
-            alertDiv.className = ""
-        },3000)
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL)=>{
-            console.log(downloadURL)
+                let percentageUpload = Math.round((snapshot.bytesTransferred/snapshot.totalBytes)*100)
+                // Add a progress bar and an alert
+                progressBar.innerHTML = `
+                <div class="progress" >
+                    <div 
+                        class="progress-bar progress-bar-striped progress-bar-animated" 
+                        role="progressbar" 
+                        style="width: ${percentageUpload}%;" 
+                        aria-valuenow="${percentageUpload}" 
+                        aria-valuemin="0" 
+                        aria-valuemax="100"
+                        >${percentageUpload}%
+                    </div>
+                </div>
+               
+                `
+            },
+            (error)=>{
+                // in case the upload fails
+                console.log(err)
+            },
+            ()=>{
+                // handle successful uploads
+                console.log("upload is complete")
+                progressBar.innerHTML = ""
+                alertDiv.innerHTML = `
+                <p class="text-center">Upload Successful!</p>
+                `
+                alertDiv.className = "alert alert-success"
+                setTimeout(()=>{
+                    alertDiv.innerHTML = ""
+                    alertDiv.className = ""
+                },3000)
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL)=>{
+                    console.log(downloadURL)
+                })
+            }
+            )
         })
-    }
-  )
-  })
 
-let allMovieRef = ref(database,"Movies")
-onValue(allMovieRef,(snapshot)=>{
-    let data = snapshot.val()
-    if(data){
-        movieIndex = data.length
-    }else{
-        movieIndex = 0
-    }
-})
+        let allMovieRef = ref(database,"allMovies")
+        onValue(allMovieRef,(snapshot)=>{
+            let data = snapshot.val()
+            if(data){
+                movieIndex = data.length
+            }else{
+                movieIndex = 0
+            }
+        })
     </script>
 </body>
 </html>

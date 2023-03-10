@@ -41,39 +41,35 @@
                         messagingSenderId: "754229905760",
                         appId: "1:754229905760:web:f8aea695d4e9969a1af605"
                     };
-
-                  
-                // Initialize Firebase
-                const app = initializeApp(firebaseConfig);
-                const database = getDatabase();
-                const storage = getStorage()
-                
-
-                let allMovieRef = ref(database,"Movie")
-                onValue(allMovieRef,(snapshot)=>{
-                    let data = snapshot.val()
-                    // console.log(data)//
-                   // myRowDiv.innerHTML = ""
-
-                      data.map((movie)=>{
-                        let movieRef = stRef(storage,`${movie.movieName}`)
-                        getDownloadURL(movieRef).then((url)=>{
-                            console.log(url)
-                            myRowDiv.innerHTML += `
-                            <div class="card col-md-3 mx-2 my-2 bg-secondary text-light text-center rounded-sm animate__animated  animate__fadeInLeft">
-                                <p class="py-3 "><video height="200px" src='${url}' controls class="card-img-top"/></p>
-                                <div class="card-body">
-                                    <h5 class="card-title ">${movie.title}</h5>
-                                    <p>${movie.genre}</p>
-                                    <p>${movie.duration}</p>
-                                    <small>${movie.cast}</small>
+                    const app = initializeApp(firebaseConfig);
+                    const database = getDatabase();
+                    const storage = getStorage()
+        
+                    let allMoviesRef = ref(database,"allMovies")
+                    onValue(allMoviesRef,(snapshot)=>{
+                        let data = snapshot.val()
+                        console.log(data)
+                        myRowDiv.innerHTML =""
+                       
+                        data.map((movie)=>{
+                            let movieRef = stRef(storage,`${movie.movieName}`)
+                            getDownloadURL(movieRef).then((url)=>{
+                                console.log(url)
+                                myRowDiv.innerHTML += `
+                                <div class="card col-md-3 mx-2 my-2 bg-secondary text-light text-center rounded-sm animate__animated  animate__fadeInLeft">
+                                    <p class="py-3 "><video height="200px" src='${url}' controls class="card-img-top"/></p>
+                                    <div class="card-body">
+                                        <h5 class="card-title ">${movie.title}</h5>
+                                        <p>${movie.genre}</p>
+                                        <p>${movie.duration}</p>
+                                        <small>${movie.cast}</small>
+                                    </div>
                                 </div>
-                            </div>
-                            `
+                                `
+                            })
+                          
                         })
-                      
                     })
-                })
     </script>
 </body>
 </html>
